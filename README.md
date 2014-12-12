@@ -8,6 +8,8 @@ Directives for angularjs
 
 ``swipeToDelete`` - swipe to delete, uses tracking cursor
 
+``touchStart`` - touch start event
+
 
 ## License
 
