@@ -4,6 +4,12 @@ App.run(['$window', 'Const',
     function($window, Const) {
         var isShowLog = Const && Const.debugLog;
 
+        var showLogBtnPosition = {
+            offsetX: 0,
+            offsetY: 0,
+            radius: 12
+        };
+
         if (isShowLog && !document.querySelector('#debugger')) {
             var isNativeConsole = !!$window['console'];
             var console = isNativeConsole ? $window.console : $window.console = {};
@@ -23,17 +29,20 @@ App.run(['$window', 'Const',
                     debugSwitchEl.style.zoom = 1;
                 };
                 var css = '#debugger {position: absolute; top: 0px; bottom: 0px; right: 0px; left: 100%; z-index: 9999; background-color: rgba(255,255,255,.9); color: #000;}' +
-                        '#logger {overflow: auto; position: absolute; top: 0px; left: 0px; right: 0px; bottom: 40px;}' +
-                        '#logger:empty + #debugger-switcher {background-color: rgba(255,255,0,.4);}' +
-                        '#debugger-switcher {content: ""; display: block; position: absolute; left: -20px; top: 0px; width: 20px; height: 20px; background-color: rgba(255,0,0,.4); border-radius: 50%;}' +
-                        '#debugger .log-event {border-top: 1px dashed #ccc;}' +
-                        '#debugger .log-event pre {line-height: 1; background-color: transparent; border: none; padding: 5px; font-size: 10px; margin: 0;}' +
-                        '#debugger .input-line {text-align: center; position: absolute; bottom: 0px; left: 0px; right: 0px;}' +
-                        '#debugger .input-line input {width: 100%; height: 20px; padding: 0; border: 0; background-color: #eeeeee;}' +
-                        '#debugger .clear-btn {text-align: right; position: absolute; bottom: 20px; left: 0px; right: 0px;}' +
-                        '#debugger .clear-btn button {width: 50px; height: 20px; padding: 0; border: 0; display: none;}' +
-                        '#debugger.show {left: 20%;}' +
-                        '#debugger.show button {display: inline-block;}';
+                    '#logger {overflow: auto; position: absolute; top: 0px; left: 0px; right: 0px; bottom: 40px;}' +
+                    '#logger:empty + #debugger-switcher {background-color: rgba(0,255,0,.4);}' +
+                    '#debugger-switcher {content: ""; display: block; position: absolute; ' +
+                        'left: ' + (-showLogBtnPosition.offsetY - showLogBtnPosition.radius * 2) + 'px; top: ' + (showLogBtnPosition.offsetX) + 'px; ' +
+                        'width: ' + (showLogBtnPosition.radius * 2) + 'px; height: ' + (showLogBtnPosition.radius * 2) + 'px; ' +
+                        'background-color: rgba(255,0,0,.4); border-radius: 50%;}' +
+                    '#debugger .log-event {border-top: 1px dashed #ccc;}' +
+                    '#debugger .log-event pre {line-height: 1; background-color: transparent; border: none; padding: 5px; font-size: 10px; margin: 0;}' +
+                    '#debugger .input-line {text-align: center; position: absolute; bottom: 0px; left: 0px; right: 0px;}' +
+                    '#debugger .input-line input {width: 100%; height: 20px; padding: 0; border: 0; background-color: #eeeeee;}' +
+                    '#debugger .clear-btn {text-align: right; position: absolute; bottom: 20px; left: 0px; right: 0px;}' +
+                    '#debugger .clear-btn button {width: 50px; height: 20px; padding: 0; border: 0; display: none;}' +
+                    '#debugger.show {left: 20%;}' +
+                    '#debugger.show button {display: inline-block;}';
                 var styleElem = document.createElement('style');
                 styleElem.type = 'text/css';
                 styleElem.styleSheet ? styleElem.styleSheet.cssText = css : styleElem.appendChild(document.createTextNode(css));
@@ -43,8 +52,8 @@ App.run(['$window', 'Const',
                     debugEl.classList.toggle('show');
                 };
 
-                input.addEventListener("keypress", function(ev){
-                    if (ev.keyCode == 13){
+                input.addEventListener("keypress", function(ev) {
+                    if (ev.keyCode == 13) {
                         var cmd = this.value;
                         this.value = "";
                         runCmd(cmd);
@@ -53,9 +62,9 @@ App.run(['$window', 'Const',
             })();
 
             var isCordova = !!$window.cordova;
-            if (isNativeConsole){
+            if (isNativeConsole) {
                 var logOld = console.log;
-                console.log = function(){
+                console.log = function() {
                     var args = isCordova ? [parseArguments(arguments)] : arguments;
                     logOld.apply(console, args);
                     $window.log(parseArguments(arguments));
@@ -86,11 +95,11 @@ App.run(['$window', 'Const',
             };
         }
 
-        function runCmd(cmd){
-            try{
+        function runCmd(cmd) {
+            try {
                 cmd = 'console.log(' + cmd + ')';
                 eval.call($window, cmd);
-            } catch(e){
+            } catch (e) {
                 log(e.stack, e.message);
             }
         }
@@ -106,9 +115,9 @@ App.run(['$window', 'Const',
             debugSwitchEl.style.zoom = 1;
         }
 
-        function parseArguments(args){
+        function parseArguments(args) {
             var text = "";
-            for (var i = 0, l = args.length; i < l; i++){
+            for (var i = 0, l = args.length; i < l; i++) {
                 var item = args[i];
                 text = text + angular.toJson(item, true) + "; ";
             }
